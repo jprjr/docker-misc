@@ -1,0 +1,5 @@
+# centos 6
+rpm -i http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
+# centos 5
+rpm -i http://dl.fedoraproject.org/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm
