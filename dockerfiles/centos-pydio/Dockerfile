@@ -9,8 +9,6 @@ RUN pear config-set preferred_state alpha && \
     pear install VersionControl_Git && \
     pear config-set preferred_state stable
 
-RUN rpm -i --nodeps http://pkgs.repoforge.org/unoconv/unoconv-0.5-1.el6.rf.noarch.rpm
-
 RUN sed -i '/^file_uploads/c \
 file_uploads = On' /etc/php.ini
 
