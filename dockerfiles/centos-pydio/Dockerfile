@@ -1,4 +1,4 @@
-FROM jprjr/centos-php
+FROM jprjr/centos-php-fpm
 MAINTAINER John Regan <john@jrjrtech.com>
 
 RUN yum -y install git rsync imagemagick ghostscript \
