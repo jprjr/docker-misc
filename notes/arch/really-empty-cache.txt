@@ -1,0 +1,6 @@
+# remove a package, old deps + build-deps,
+# and empty the pacman cache
+pacman -Ru --noconfirm <package>
+pacman -R --noconfirm $(pacman -Qdtq)
+paccache -rk0
+pacman -Scc --noconfirm
