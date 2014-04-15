@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-rsync -av /usr/share/webapps/pydio-data-5.2.3/ /var/lib/pydio/data/
+rsync -av /usr/share/webapps/pydio-data-git/ /var/lib/pydio/data/

@@ -30,11 +30,11 @@ open_basedir = /usr/share/webapps/pydio/:/tmp/:/usr/share/pear/:/var/lib/pydio/'
 RUN mkdir -p /usr/share/webapps && \
     mkdir -p /var/lib/pydio &&  \
     cd /usr/share/webapps && \
-    curl -R -L \
-    "http://downloads.sourceforge.net/project/ajaxplorer/pydio/stable-channel/5.2.3/pydio-core-5.2.3.tar.gz" \
-    | tar xz  && \
-    mv pydio-core-5.2.3/data /usr/share/webapps/pydio-data-5.2.3  && \
-    ln -s /usr/share/webapps/pydio-core-5.2.3 /usr/share/webapps/pydio && \
+    git clone -b dev https://github.com/jprjr/pydio-core.git && \
+    mv pydio-core/core/src /usr/share/webapps/pydio-core-git && \
+    rm -rf pydio-core && \
+    mv pydio-core-git/data /usr/share/webapps/pydio-data-git  && \
+    ln -s /usr/share/webapps/pydio-core-git /usr/share/webapps/pydio && \
     ln -s /var/lib/pydio/data /usr/share/webapps/pydio/data && \
     chown -R apache:apache /var/lib/pydio && \
     chown -R apache:apache /usr/share/webapps
