@@ -5,19 +5,19 @@ set -e
 _target=arm-linux-gnueabihf
 
 # docker 0.11.1 borks /dev/fd
-#ln -sf /proc/self/fd /dev/fd
-#ln -sf /dev/null /dev/stdin
+ln -sf /proc/self/fd /dev/fd
+ln -sf /dev/null /dev/stdin
 
 pacman -Syy
 # install packer
 pacman -S --noconfirm --quiet --needed distcc base-devel > /dev/null 2>/dev/null
 pacman -S --noconfirm --quiet --needed --asdeps gperf git jshon expac > /dev/null 2>/dev/null
 
-mkdir /tmp/packer && \
-    cd /tmp/packer && \
-    curl -R -L -O https://aur.archlinux.org/packages/pa/packer/PKGBUILD 2>/dev/null && \
-    makepkg --asroot -i --noconfirm >/dev/null 2>/dev/null && \
-    cd / && rm -rf /tmp/packer
+mkdir /tmp/packer 
+cd /tmp/packer
+curl -R -L -O https://aur.archlinux.org/packages/pa/packer/PKGBUILD
+makepkg --asroot -s -i --noconfirm
+cd / && rm -rf /tmp/packer
 
 # install the basic, non-conflicting stuff
 packer -S --noconfirm --noedit ${_target}-binutils 
