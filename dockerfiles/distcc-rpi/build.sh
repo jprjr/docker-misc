@@ -5,8 +5,8 @@ set -e
 _target=arm-linux-gnueabihf
 
 # docker 0.11.1 borks /dev/fd
-ln -sf /proc/self/fd /dev/fd
-ln -sf /dev/null /dev/stdin
+#ln -sf /proc/self/fd /dev/fd
+#ln -sf /dev/null /dev/stdin
 
 pacman -Syy
 # install packer
