@@ -3,7 +3,8 @@ MAINTAINER John Regan <john@jrjrtech.com>
 
 RUN yum -y install git rsync imagemagick ghostscript \
     subversion php-pear-Mail-mimeDecode \
-    php-pear-HTTP-OAuth tar gzip bzip2 
+    php-pear-HTTP-OAuth tar gzip bzip2 \
+    php-pecl-ssh2 samba-client
 
 RUN pear config-set preferred_state alpha && \
     pear install VersionControl_Git && \
@@ -34,7 +35,7 @@ RUN mkdir -p /usr/share/webapps && \
     "http://downloads.sourceforge.net/project/ajaxplorer/pydio/stable-channel/5.2.3/pydio-core-5.2.3.tar.gz" \
     | tar xz  && \
     mv pydio-core-5.2.3/data /usr/share/webapps/pydio-data-5.2.3  && \
-    ln -s /usr/share/webapps/pydio-core-5.2.3 /usr/share/webapps/pydio && \
+    mv /usr/share/webapps/pydio-core-5.2.3 /usr/share/webapps/pydio && \
     ln -s /var/lib/pydio/data /usr/share/webapps/pydio/data && \
     chown -R apache:apache /var/lib/pydio && \
     chown -R apache:apache /usr/share/webapps
