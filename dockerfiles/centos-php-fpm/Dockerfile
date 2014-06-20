@@ -4,7 +4,8 @@ MAINTAINER John Regan <john@jrjrtech.com>
 RUN rpm -i http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 RUN yum -y install php php-fpm php-gd php-ldap \
     php-sqlite php-pgsql php-pear php-mysql \
-    php-mcrypt php-xcache php-xml php-xmlrpc
+    php-mcrypt php-xcache php-xml php-xmlrpc \
+    msmtp
 
 RUN sed -i '/^listen/c \
 listen = 0.0.0.0:9000' /etc/php-fpm.d/www.conf
