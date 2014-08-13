@@ -12,7 +12,7 @@ You'll want to mount a volume to `/output`
 ```bash
 $ docker build -t jprjr/logstash-forwarder-builder:ubuntu .
 $ mkdir output
-$ docker run -v $(pwd)/output:/output prjr/logstash-forwarder-builder:ubuntu
+$ docker run -v $(pwd)/output:/output jprjr/logstash-forwarder-builder:ubuntu
 ```
 
 If everything works correctly, you'll have a .deb file in `output`
