@@ -80,6 +80,10 @@ echo /usr/lib/skalibs         > conf-compile/path-library
 build_skarnet_package
 install_skarnet_package
 install_skarnet_package /package
+rm -rf /package/usr/lib
+rm -rf /package/usr/include
+tar -cf /output/execline-${execline_version}-musl-static.tar -C /package .
+rm -rf /package/*
 
 # install s6
 cd /build
@@ -97,5 +101,6 @@ echo /usr/lib/execline        >>conf-compile/path-library
 
 build_skarnet_package
 install_skarnet_package /package
-
+rm -rf /package/usr/lib
+rm -rf /package/usr/include
 tar -cf /output/s6-${s6_version}-musl-static.tar -C /package .
