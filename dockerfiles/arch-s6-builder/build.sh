@@ -79,6 +79,7 @@ echo /usr/lib/skalibs         > conf-compile/path-library
 
 build_skarnet_package
 install_skarnet_package
+install_skarnet_package /package
 
 # install s6
 cd /build
