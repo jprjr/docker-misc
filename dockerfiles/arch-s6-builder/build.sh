@@ -8,10 +8,12 @@ execline_version=1.3.1.1
 s6_version=1.1.3.2
 
 function build_skarnet_package {
-  echo musl-gcc                 > conf-compile/conf-cc
-  echo musl-gcc -static         > conf-compile/conf-ld
-  echo musl-gcc                 > conf-compile/conf-dynld
-  echo /usr/bin                 > conf-compile/conf-install-command
+  echo musl-gcc -g3 -ggdb3          > conf-compile/conf-cc
+  echo musl-gcc -g3 -ggdb3 -static  > conf-compile/conf-ld
+  echo musl-gcc -g3 -ggdb3          > conf-compile/conf-dynld
+  echo /usr/bin                     > conf-compile/conf-install-command
+  echo ""                           > conf-compile/conf-stripbins
+  echo ""                           > conf-compile/conf-striplibs
   rm -f conf-compile/flag-slashpackage
   touch conf-compile/flag-allstatic
   package/compile
@@ -101,6 +103,5 @@ echo /usr/lib/execline        >>conf-compile/path-library
 
 build_skarnet_package
 install_skarnet_package /package
-rm -rf /package/usr/lib
-rm -rf /package/usr/include
+install -D -m644 /etc/leapsecs.dat /package/etc/leapsecs.dat
 tar -cf /output/s6-${s6_version}-musl-static.tar -C /package .
