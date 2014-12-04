@@ -101,6 +101,7 @@ echo /usr/lib/execline        >>conf-compile/path-library
 
 build_skarnet_package
 install_skarnet_package /package
+install -D -m644 /etc/leapsecs.dat /package/etc/leapsecs.dat
 rm -rf /package/usr/lib
 rm -rf /package/usr/include
 tar -cf /output/s6-${s6_version}-musl-static.tar -C /package .
