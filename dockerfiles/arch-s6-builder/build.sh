@@ -2,106 +2,66 @@
 set -e
 set -x
 
-musl_version=1.0.4
-skalibs_version=1.6.0.0
-execline_version=1.3.1.1
-s6_version=1.1.3.2
+declare -A versions
+versions[musl]=1.0.4
+versions[skalibs]=2.1.0.0
+versions[execline]=2.0.1.0
+versions[s6]=2.0.0.1
+
+declare -A includes
+includes[skalibs]="--with-include=/usr/musl/include"
+includes[execline]="--with-include=/usr/musl/include --with-include=/opt/skalibs/usr/include"
+includes[s6]="--with-include=/usr/musl/include --with-include=/opt/skalibs/usr/include --with-include=/opt/execline/usr/include"
+
+declare -A libs
+libs[skalibs]="--with-lib=/usr/musl/lib"
+libs[execline]="--with-lib=/usr/musl/lib --with-lib=/opt/skalibs/usr/lib/skalibs"
+libs[s6]="--with-lib=/usr/musl/lib --with-lib=/opt/skalibs/usr/lib/skalibs --with-lib=/opt/execline/usr/lib/execline"
+
+declare -A sysdeps
+sysdeps[skalibs]=""
+sysdeps[execline]="--with-sysdeps=/opt/skalibs/usr/lib/skalibs/sysdeps"
+sysdeps[s6]="--with-sysdeps=/opt/skalibs/usr/lib/skalibs/sysdeps"
 
 function build_skarnet_package {
-  echo musl-gcc                 > conf-compile/conf-cc
-  echo musl-gcc -static         > conf-compile/conf-ld
-  echo musl-gcc                 > conf-compile/conf-dynld
-  echo /usr/bin                 > conf-compile/conf-install-command
-  rm -f conf-compile/flag-slashpackage
-  touch conf-compile/flag-allstatic
-  package/compile
-  rm -f package/library.so.exported
+  local package=$1
+  cd /build
+  curl -R -L -O "http://skarnet.org/software/${package}/${package}-${versions[$package]}.tar.gz"
+  tar xf "${package}-${versions[$package]}.tar.gz"
+  cd "${package}-${versions[$package]}"
+  CC="musl-gcc" ./configure \
+    --prefix=/usr \
+    --disable-shared \
+    ${includes[$package]} \
+    ${libs[$package]} \
+    ${sysdeps[$package]} \
+    --enable-force-devr
+  make
+  make DESTDIR="/opt/${package}" install
 }
 
-function install_skarnet_package {
-  for i in package/*.exported 
-  do
-    case $(basename $i) in
-    library.so.exported) d=/lib                    ;;
-    include.exported)    d=/usr/include/skalibs    ;;
-    sysdeps.exported)    d=/usr/lib/skalibs/sysdeps;;
-    library.exported)    d=/usr/lib/skalibs        ;;
-    command.exported)    d=/usr/bin                ;;
-    esac
-    f=$(basename $i|sed 's/.exported//')
-    mkdir -p $1$d
-    install -D `sed s,^,$f/, $i` "$1$d"
-  done
+function tar_skarnet_package {
+  local package=$1
+  local version=$2
+  rm -rf "/opt/${package}/usr/lib"
+  rm -rf "/opt/${package}/usr/include"
+  tar -cf "/output/${package}-${versions[$package]}-musl-static.tar" -C "/opt/${package}" .
 }
-
-mkdir /package  
-
-cd /build
 
 # install musl
-curl -R -L -O http://www.musl-libc.org/releases/musl-${musl_version}.tar.gz
-tar xf musl-${musl_version}.tar.gz
-cd musl-${musl_version}
-
+curl -R -L -O http://www.musl-libc.org/releases/musl-${versions[musl]}.tar.gz
+tar xf musl-${versions["musl"]}.tar.gz
+cd musl-${versions["musl"]}
 CFLAGS="-fno-toplevel-reorder -fno-stack-protector" ./configure --prefix=/usr/musl --exec-prefix=/usr --disable-shared
 make
 make install
 
 # install skalibs
-cd /build
-curl -R -L -O http://skarnet.org/software/skalibs/skalibs-${skalibs_version}.tar.gz
-tar xf skalibs-${skalibs_version}.tar.gz
-cd prog/skalibs-${skalibs_version}
+build_skarnet_package skalibs
+build_skarnet_package execline
+build_skarnet_package s6
 
-# configure skalibs-specific items
-echo /usr/lib/skalibs         > conf-compile/conf-install-library
-echo /usr/include/skalibs     > conf-compile/conf-install-include
-echo /usr/lib/skalibs/sysdeps > conf-compile/conf-install-sysdeps
+install -D -m644 /etc/leapsecs.dat /opt/s6/etc/leapsecs.dat
 
-build_skarnet_package 
-install_skarnet_package
-
-install -D -m644 etc/leapsecs.dat /etc/leapsecs.dat
-
-#install execline
-cd /build
-curl -R -L -O http://skarnet.org/software/execline/execline-${execline_version}.tar.gz
-tar xf execline-${execline_version}.tar.gz
-cd admin/execline-${execline_version}
-
-# configure execline-specific items
-echo /usr/lib/skalibs/sysdeps > conf-compile/import
-echo /usr/libexec/execline    > conf-compile/conf-install-command
-echo /usr/lib/execline        > conf-compile/conf-install-library
-echo /usr/include/execline    > conf-compile/conf-install-include
-echo /usr/include/skalibs     > conf-compile/path-include
-echo /usr/lib/skalibs         > conf-compile/path-library
-
-build_skarnet_package
-install_skarnet_package
-install_skarnet_package /package
-rm -rf /package/usr/lib
-rm -rf /package/usr/include
-tar -cf /output/execline-${execline_version}-musl-static.tar -C /package .
-rm -rf /package/*
-
-# install s6
-cd /build
-curl -R -L -O http://www.skarnet.org/software/s6/s6-${s6_version}.tar.gz
-tar xf s6-${s6_version}.tar.gz
-cd admin/s6-${s6_version}
-
-echo /usr/lib                 > conf-compile/conf-install-library
-echo /usr/include             > conf-compile/conf-install-include
-echo /usr/lib/skalibs/sysdeps > conf-compile/import
-echo /usr/include/skalibs     > conf-compile/path-include
-echo /usr/include/execline    >>conf-compile/path-include
-echo /usr/lib/skalibs         > conf-compile/path-library
-echo /usr/lib/execline        >>conf-compile/path-library
-
-build_skarnet_package
-install_skarnet_package /package
-install -D -m644 /etc/leapsecs.dat /package/etc/leapsecs.dat
-rm -rf /package/usr/lib
-rm -rf /package/usr/include
-tar -cf /output/s6-${s6_version}-musl-static.tar -C /package .
+tar_skarnet_package execline
+tar_skarnet_package s6
