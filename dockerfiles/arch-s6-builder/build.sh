@@ -42,10 +42,9 @@ function build_skarnet_package {
 
 function tar_skarnet_package {
   local package=$1
-  local version=$2
   rm -rf "/opt/${package}/usr/lib"
   rm -rf "/opt/${package}/usr/include"
-  tar -cf "/output/${package}-${versions[$package]}-musl-static.tar" -C "/opt/${package}" .
+  tar -czf "/output/${package}-${versions[$package]}-musl-static.tar.gz" -C "/opt/${package}" .
 }
 
 # install musl
