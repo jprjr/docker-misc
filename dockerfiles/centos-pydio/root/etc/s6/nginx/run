@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+declare EMBEDDED_NGINX
+
+if [[ $EMBEDDED_NGINX -eq 1 ]]; then
+    shopt -s nullglob
+    shopt -s dotglob
+
+    declare need_setup_nginx
+    nginx_files=(/etc/nginx/*)
+    (( ${#nginx_files[*]} )) && need_setup_nginx=0 || need_setup_nginx=1
+
+    shopt -u nullglob
+    shopt -u dotglob
+
+    if [[ $need_setup_nginx -eq 1 ]]; then
+        rsync -av /opt/nginx/ /etc/nginx/
+        chown -R apache:apache /etc/nginx
+    fi
+
+    exec nginx -c /etc/nginx/nginx.conf
+fi
+
+touch down
+s6-svc -d /etc/s6/nginx
+exit 0

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+
+shopt -s nullglob
+shopt -s dotglob
+
+declare need_setup_pydio_conf
+declare need_setup_pydio_data
+
+pydio_conf_files=(/etc/pydio/*)
+(( ${#pydio_conf_files[*]} )) && need_setup_pydio_conf=0 || need_setup_pydio_conf=1
+
+pydio_data_files=(/var/lib/pydio/data/*)
+(( ${#pydio_data_files[*]} )) && need_setup_pydio_data=0 || need_setup_pydio_data=1
+
+shopt -u nullglob
+shopt -u dotglob
+
+if [[ $need_setup_pydio_conf -eq 1 ]]; then
+  rsync -av /usr/share/webapps/pydio-conf-6.0.2/ /etc/pydio/
+  chown -R apache:apache /etc/pydio/
+fi
+
+if [[ $need_setup_pydio_data -eq 1 ]]; then
+  rsync -av /usr/share/webapps/pydio-data-6.0.2/ /var/lib/pydio/data/
+  chown -R apache:apache /var/lib/pydio/data/
+fi
+
+exec s6-setuidgid apache php-fpm -F
