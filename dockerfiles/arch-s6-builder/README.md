@@ -1,15 +1,3 @@
-# jprjr/s6-builder
+# jprjr/s6-builder-deprecated
 
-This is just a small utility image for building [s6](http://www.skarnet.org/software/s6/), a set of process supervision programs.
-
-You'll want to mount a volume to `/output`
-
-## example
-
-```bash
-$ docker build -t jprjr/s6-builder .
-$ mkdir output
-$ docker run -v $(pwd)/output:/output jprjr/s6-builder /opt/build.sh
-```
-
-If everything works correctly, you'll have a .tar file in `output`
+This docker image is out of date, please use https://github.com/just-containers/skaware-builder instead
